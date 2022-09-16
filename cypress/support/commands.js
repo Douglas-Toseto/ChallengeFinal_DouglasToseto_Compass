@@ -1,3 +1,23 @@
+import Ajv from 'ajv';
+const ajv = new Ajv({allErrors: true, verbose: true, strict: false});
+
+Cypress.Commands.add('contractValidation', (res, schema, status)=>{   //validar esquemas com AJV
+    cy.fixture(`schemas/${schema}/${status}.json`).then( schema => {
+        const validate = ajv.compile(schema);       
+        const valid = validate(res.body);
+
+        //cy.log(JSON.stringify(validate.errors));
+        if(!valid){
+            var errors = '';
+            for (let i in validate.errors){
+                let err = validate.errors[i];
+                errors += `\n ${err.instancePath} ${err.message}, but received a ${typeof err.data}`;
+                throw new Error('Erros encontrados na validação de contrato, por favor verifique: '+ errors);
+            }
+        } else { cy.log('Contrato válido')}
+    })
+})
+
 Cypress.Commands.add('postarUsuarioDuplicado', () => {
     return cy.request({
         "method": 'POST',
