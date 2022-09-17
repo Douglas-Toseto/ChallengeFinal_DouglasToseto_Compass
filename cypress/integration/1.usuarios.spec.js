@@ -5,7 +5,7 @@ import ValidaServerest from '../services/validaServerest.service'
 
 describe('Casos de teste relacionados a rota /usuarios da API Serverest', () => {
     
-    it.only('Deve retornar todos os usuários cadastrados, fazer validação de contrato e salvar um num json', () => {  //teste para a rota: GET /usuarios
+    it('Deve retornar todos os usuários cadastrados, fazer validação de contrato e salvar um num json', () => {  //teste para a rota: GET /usuarios
         Serverest.buscarUsuarios().then(res => {
             cy.contractValidation(res, 'get_usuarios', 200);
             //podemos criar outras validações além da validação de contrato
