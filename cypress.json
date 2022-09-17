@@ -5,5 +5,7 @@
     "videoHeight": 900,
     "chromeWebSecurity": false,
     "numTestsKeptInMemory": 5,
-    "screenshotsFolder": "reports/screenshots"
+    "screenshotsFolder": "reports/screenshots",
+    "reporter": "cypress-mochawesome-reporter"
+    
 }
