@@ -85,14 +85,6 @@ describe('Casos de teste sobre a rota /usuarios da API serverest', function() {
         })
     }) 
 
-    //Código do Eduardo:
-    it('Não deve postar um novo usuário administrador existente', () => {
-        cy.postarUsuarioSemSucesso().then(res => {
-          expect(res).to.be.a('object')
-          //expect(res.body.message).to.be.a('string')
-          cy.log(JSON.stringify(res))
-          //expect(res.body.message).to.be.equal('Este email já está sendo usado')
-        })
-      })
+    
 })
 

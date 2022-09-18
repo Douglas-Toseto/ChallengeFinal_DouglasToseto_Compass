@@ -62,18 +62,3 @@ Cypress.Commands.add('buscarUsuarioParaLogin', () => {
         }
     })
 })
-
-//Código do Eduardo:
-Cypress.Commands.add('postarUsuarioSemSucesso', () => {
-    return cy.request({
-      method: 'POST',
-      url: '/usuarios',
-      failOnStatusCode: false,
-      body: {
-        nome: 'Teagan Wunsch',
-        email: 'automation-postUserKenna.Bashirian@gmail.com',
-        password: '1234',
-        administrador: 'true'
-      }
-    })
-})
