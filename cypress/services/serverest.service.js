@@ -32,6 +32,19 @@ export default class Serverest {
         })
     }
 
+    //salva usuário (ao invés de um JSON)
+    static salvarUsuario(){
+        cy.request(URL_USUARIOS).then(res => {
+            cy.wrap({
+                "nome": res.body.usuarios[res.body.usuarios.length-1].nome,
+                "email": res.body.usuarios[res.body.usuarios.length-1].email,
+                "password": res.body.usuarios[res.body.usuarios.length-1].password,
+                "administrador": res.body.usuarios[res.body.usuarios.length-1].administrador,
+                "_id": res.body.usuarios[res.body.usuarios.length-1]._id
+            }).as('usuarioSalvo')
+        })
+    }
+
     //realiza login
     static logar(usuario){
         return cy.rest('POST', URL_LOGIN, usuario)
@@ -89,22 +102,23 @@ export default class Serverest {
 
     //cadastro de produto existente
     static cadastrarProdutoRepetido(){
-        cy.fixture('produto.json').then(arquivo =>{
+        Serverest.salvarProduto();
+        cy.get('@produtoSalvo').then(produto => {  //tentando usar o Wrap para ver se o erro no then para de acontecer.... (não parou)
             return cy.request({
                 method: 'POST',
                 url: URL_PRODUTOS,
                 body: {
-                    "nome": arquivo.nome,
-                    "preco": arquivo.preco,
-                    "descricao": arquivo.descricao,
-                    "quantidade": arquivo.quantidade
+                    "nome": produto.nome,
+                    "preco": produto.preco,
+                    "descricao": produto.descricao,
+                    "quantidade": produto.quantidade
                 },
-                failOnStatusCode: true,
+                failOnStatusCode: false,
                 auth: {                     
                     bearer: Cypress.env("bearer")
                 }
             })
-        })
+        }) 
     }
 
     //cadastro de produto sem token
@@ -124,7 +138,7 @@ export default class Serverest {
         return cy.request({
             method: 'DELETE',
             url: URL_PRODUTOS+'/'+id,
-            failOnStatusCode: true,
+            failOnStatusCode: false,
             auth: {                     
                 bearer: Cypress.env("bearer")
             }
@@ -139,6 +153,79 @@ export default class Serverest {
             failOnStatusCode: false,
         })
     }
+
+    //alterar produto com sucesso
+    static alterarProduto(id, produto){
+        return cy.request({
+            method: 'PUT',
+            url: URL_PRODUTOS+'/'+id,
+            body: produto,
+            failOnStatusCode: false,
+            auth: {                     
+                bearer: Cypress.env("bearer")
+            }
+        })
+    }
+
+    //buscar produto para ser salvo
+    static salvarProduto(){
+        cy.request(URL_PRODUTOS).then(res=>{
+            cy.wrap({                           //cy.wrap empacota informações que podem ser acessadas com cy.get e pelo seu alias
+                "nome": res.body.produtos[res.body.produtos.length-1].nome,
+                "preco": res.body.produtos[res.body.produtos.length-1].preco,
+                "descricao": res.body.produtos[res.body.produtos.length-1].descricao,
+                "quantidade": res.body.produtos[res.body.produtos.length-1].quantidade,
+                "_id": res.body.produtos[res.body.produtos.length-1]._id
+            }).as('produtoSalvo')               //alias do pacote
+        })
+    }
+
+
+    //---------------------------- Ações relacionadas a /carrinhos -------------------------------------------------------
+
+    //lista todos os carrinhos ativos
+    static buscarCarrinhos(){
+        return cy.rest('GET', URL_CARRINHOS);
+    }
+
+    static buscarCarrinhoPorId(id){
+        return cy.rest('GET', URL_CARRINHOS+'/'+id);
+    }
+
+    static cadastrarCarrinho(produtos){
+        return cy.request({
+            method: 'POST',
+            url: URL_CARRINHOS,
+            body: produtos,
+            failOnStatusCode: false,
+            auth: {                     
+                bearer: Cypress.env("bearer")
+            }
+        })
+    }
+
+    static concluirCompra(){
+        return cy.request({
+            method: 'DELETE',
+            url: URL_CARRINHOS+'/concluir-compra',
+            failOnStatusCode: false,
+            auth: {                     
+                bearer: Cypress.env("bearer")
+            }
+        })
+    }
+
+    static cancelarCompra(){
+        return cy.request({
+            method: 'DELETE',
+            url: URL_CARRINHOS+'/cancelar-compra',
+            failOnStatusCode: false,
+            auth: {                     
+                bearer: Cypress.env("bearer")
+            }
+        })
+    }
+   
 
 
 

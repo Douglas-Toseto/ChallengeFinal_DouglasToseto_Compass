@@ -5,7 +5,18 @@ import ValidaServerest from '../services/validaServerest.service'
 import { faker } from '@faker-js/faker'
 import Factory from '../fixtures/factory'
 
+// >>>>>> Deixar os testes o mais indepente e isolados possíveis <<<<<<
+
 describe('Casos de teste relacionados a rota /usuarios da API Serverest', () => {
+    
+    beforeEach('Salvar usuário no arquivo Json', ()=>{               //para tentar deixar os casos de teste mais isolados
+        Serverest.buscarUsuarios().then(res => {
+            cy.contractValidation(res, 'get_usuarios', 200);
+            //podemos criar outras validações além da validação de contrato
+            ValidaServerest.validarBuscaUsuario(res);
+            cy.writeFile('cypress/fixtures/usuario.json', res.body.usuarios[res.body.usuarios.length-1])  //salvando o último usuário cadastrado
+        })
+    })
     
     //--------------------------- GET ------------------------------------------------------------------------------------------------------------------------
     it('Deve retornar todos os usuários cadastrados, fazer validação de contrato e salvar o útimo da lista num json', () => {  //teste para a rota: GET /usuarios
@@ -90,7 +101,7 @@ describe('Casos de teste relacionados a rota /usuarios da API Serverest', () => 
                 //cy.log(JSON.stringify(res.body))
                 expect(res.status).to.be.equal(200);
                 expect(res.body.message).to.be.equal('Registro alterado com sucesso');
-                usuario._id = idUsuario;
+                usuario._id = idUsuario; // coloca o atributo ID no objeto antes de salvar
                 cy.log(JSON.stringify(usuario));
                 cy.writeFile('cypress/fixtures/usuario.json', usuario); //salvando no JSON as informações novas
             })
@@ -107,8 +118,26 @@ describe('Casos de teste relacionados a rota /usuarios da API Serverest', () => 
         })
     })
     
+    // >> Conflito com os casos de testes anteriores. Funciona isoladamente.
+    // Novamente, wrap parece ter resolvido o problema do conflito e deixado o teste mais isolado
     it('Deve falhar ao realizar uma alteração de cadastro com id inexistente e e-mail já cadastrado (ie, seria realizado um novo cadastro com e-mail repetido)', ()=>{
-        // cy.wait(3000) 
+        //cy.wait(3000) 
+        Serverest.salvarUsuario();
+        cy.get('@usuarioSalvo').then(usuario => {
+            let novoUsuario = Factory.gerarUsuario();
+            novoUsuario.email = usuario.email;
+            let idNovoUsuario = faker.datatype.number();
+            Serverest.alteraUsuario(idNovoUsuario, novoUsuario).then(res => {
+                cy.contractValidation(res, 'put_usuarios', 400);
+                expect(res.status).to.be.eq(400);
+                expect(res.body.message).to.be.eq('Este email já está sendo usado');
+            })
+
+        })
+        
+        
+        
+        /*
         cy.fixture('usuario.json').then(arquivo => {    //coletandos as informações do usuário previamente salvas no json
             let usuario = {
                 "nome": arquivo.nome,                   // Está ocorrendo conflito com o PUT que realiza alteração com sucesso, parece que não está recuperando as informações atualizadas do JSON
@@ -124,15 +153,15 @@ describe('Casos de teste relacionados a rota /usuarios da API Serverest', () => 
                 expect(res.status).to.be.eq(400);
                 expect(res.body.message).to.be.eq('Este email já está sendo usado');
             })
-        })
+        })*/
     })
 
 
     //------------------- DELETE ---------------------------------------------------------------------------------------
     it('Deve excluir um usuário com id especificado', ()=>{
         cy.fixture('usuario.json').then(arquivo => {    //vamos excluir o usuário salvo no Json (último do array, e que foi modificado no teste anterior)
-            //let idUsuario = arquivo._id;
-            let idUsuario = faker.datatype.number();
+            let idUsuario = arquivo._id;
+            //let idUsuario = faker.datatype.number();      //alterando o ID para ver a mudança da mensagem retornada (o status continua 200)
             Serverest.excluirUsuario(idUsuario).then(res =>{
                 cy.contractValidation(res, 'delete_usuarios', 200);
                 expect(res.status).to.be.eq(200);
