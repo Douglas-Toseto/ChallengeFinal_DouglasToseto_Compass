@@ -16,7 +16,7 @@ Sprint 5 da trilha **Logical Forest** do programa de bolsas da Compass.UOL, cujo
 - Aprender a configurar ambientes dinâmicos no Cypress,
 - Utilizar a API **Serverest** como objeto de estudo para análise e mapeamento de rotas, com o auxílio das ferramentas Postman e Xmind, 
 - Entender a estrutura de **comandos personalizados** do Cypress,
-- Aprender sobre o Design Pattern Service Object,
+- Aprender sobre o Design Pattern **Service Object**,
 - Aprender conceitos relacionados a **Massa de dados fixas e dinâmicas** e conhecer a biblioteca **faker-js**,
 - Aprender o conceito de *Schemas*, a realizar **testes de contrato de APIs** e conhecer a biblioteca **Ajv**,
 - Realizar atividades práticas relacionadas testes (adicionando novos casos de testes relacionados às rotas da API Serverest),
@@ -58,7 +58,7 @@ npm install --save-dev cypress-mochawesome-reporter
 >
 
 ### :cd: Execução dos testes
-Os casos de testes se encontram na pasta `cypress/integration/`. Foram definidos comandos personalizados, que se encontram em `cypress/support/commands.js`. Também foi utilizado o *design pattern Service Object* como guia de organização, com os métodos que realizam as ações da API testada sendo descritos em `cypress/services/serverest.service.js` e os métodos que realizam as validações descritos em `cypress/services/validaServerest.service.js`.
+Os casos de testes se encontram na pasta `cypress/integration/`. Foram definidos comandos personalizados, que se encontram em `cypress/support/commands.js`. Também foi utilizado o *design pattern Service Object* como guia de organização, com os métodos que realizam as ações da API testada sendo descritos em `cypress/services/serverest.service.js` e os métodos que realizam as validações descritos em `cypress/services/validaServerest.service.js`. Os reports gerados pelo complemento mochawesome ficam em `cypress/reports/html`.
 
 Para realizar os testes abrindo a interface gráfica do Cypress em ambiente de produção:
 ```
